@@ -12,7 +12,7 @@ async function analyzeScript() {
     headers: {
       'Content-Type': 'application/json',
       'X-RapidAPI-Key': RAPIDAPI_KEY,
-      'X-RapidAPI-Host': 'openai-api4.p.rapidapi.com'
+      'X-RapidAPI-Host': 'rapidapi.com'
     },
     body: JSON.stringify({
       model: 'gpt-4',
@@ -36,7 +36,7 @@ async function generateStoryboard() {
     headers: {
       'Content-Type': 'application/json',
       'X-RapidAPI-Key': RAPIDAPI_KEY,
-      'X-RapidAPI-Host': 'stable-diffusion.p.rapidapi.com'
+      'X-RapidAPI-Host': 'rapidapi.com'
     },
     body: JSON.stringify({
       prompt: prompt,
@@ -59,14 +59,13 @@ async function generateVideo() {
     const script = quill.getText();
     
     // Step 1: Generate audio (using Resemble.AI or other TTS)
-    // Using Resemble.AI (RapidAPI)
     async function generateVoiceover(text) {
         const response = await fetch('https://large-text-to-speech.p.rapidapi.com/tts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'X-RapidAPI-Key': RAPIDAPI_KEY,
-            'X-RapidAPI-Host': 'resemble-ai.p.rapidapi.com'
+            'X-RapidAPI-Host': 'rapidapi.com'
           },
           body: JSON.stringify({
           project_uuid: 'YOUR_PROJECT_ID',
@@ -79,12 +78,12 @@ async function generateVideo() {
         return data.audio_url; // URL of generated audio
     }
     // Step 2: Create video with avatar
-    const response = await fetch('https://runwayml.p.rapidapi.com/generate/text', {
+    const response = await fetch('https://runwayml-api1.p.rapidapi.com/generate/text', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-RapidAPI-Key': RAPIDAPI_KEY,
-        'X-RapidAPI-Host': 'text-to-video.p.rapidapi.com'
+        'X-RapidAPI-Host': 'rapidapi.com'
       },
       body: JSON.stringify({
         "avatar": "anna", // Pre-built avatar
