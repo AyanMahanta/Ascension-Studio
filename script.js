@@ -6,52 +6,73 @@ const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 // GPT-4 Script Analysis
 async function analyzeScript() {
   const script = quill.getText();
-  
-  const response = await fetch('https://ai-sentiment-analysis-text-insights-emotion-detection.p.rapidapi.com/analyzeBulkSentiment?noqueue=1', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-RapidAPI-Key': RAPIDAPI_KEY,
-      'X-RapidAPI-Host': 'rapidapi.com'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [{
-        role: 'user',
-        content: `Analyze this screenplay for plot and dialogue:\n\n${script}`
-      }]
-    })
-  });
-  
-  const data = await response.json();
-  document.getElementById('feedback').innerHTML = data.choices[0].message.content;
+
+  try {
+    const response = await fetch('https://cheapest-gpt-4-turbo-gpt-4-vision-chatgpt-openai-ai-api.p.rapidapi.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-RapidAPI-Key': RAPIDAPI_KEY, // Replace with your key
+        'X-RapidAPI-Host': 'cheapest-gpt-4-turbo-gpt-4-vision-chatgpt-openai-ai-api.p.rapidapi.com'
+      },
+      body: JSON.stringify({
+        messages: [{
+          role: "user",
+          content: `Analyze this screenplay for plot structure, character development, and dialogue quality:\n\n${script}`
+        }],
+        model: "gpt-4o",
+        max_tokens: 1000, // Increased for detailed analysis
+        temperature: 0.7 // For more focused responses
+      })
+    });
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    
+    const data = await response.json();
+    const feedback = data.choices[0].message.content;
+    
+    // Format feedback with line breaks
+    document.getElementById('feedback').innerHTML = 
+      feedback.replace(/\n/g, '<br>');
+
+  } catch (error) {
+    console.error('Analysis failed:', error);
+    alert('Failed to analyze script. Check console for details.');
+  }
 }
 
 // Stable Diffusion Storyboards
 async function generateStoryboard() {
-  const text = quill.getText().substring(0, 100); // Use first line as prompt
-  
-  const response = await fetch('https://open-ai21.p.rapidapi.com/texttoimage2', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-RapidAPI-Key': RAPIDAPI_KEY,
-      'X-RapidAPI-Host': 'rapidapi.com'
-    },
-    body: JSON.stringify({
-      text: text
-    })
-  });
-  
-  const data = await response.json();
-  const container = document.getElementById('storyboard');
-  container.innerHTML = '';
-  
-  data.images.forEach(url => {
+  const prompt = quill.getText().split('\n')[0]; // Use first line as prompt
+
+  try {
+    const response = await fetch('https://open-ai21.p.rapidapi.com/texttoimage2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-RapidAPI-Key': RAPIDAPI_KEY, // Replace with your key
+        'X-RapidAPI-Host': 'open-ai21.p.rapidapi.com'
+      },
+      body: JSON.stringify({
+        text: prompt // API expects "text" field (not "prompt")
+      })
+    });
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    
+    const data = await response.json();
+    const container = document.getElementById('storyboard');
+    container.innerHTML = ''; // Clear previous results
+
+    // Create image element
     const img = document.createElement('img');
-    img.src = url;
+    img.src = data.imageUrl; // Verify response structure in API docs
     container.appendChild(img);
-  });
+
+  } catch (error) {
+    console.error('Storyboard generation failed:', error);
+    alert('Failed to generate storyboard. Check console for details.');
+  }
 }
 
 async function generateVideo() {
