@@ -1,7 +1,7 @@
 const quill = new Quill('#editor', { theme: 'snow' });
 
 // RapidAPI Config
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+const RAPIDAPI_KEY = "7008b40800mshf5151d0bd0f91a4p1242b7jsnfca887897331";
 
 // GPT-4 Script Analysis
 async function analyzeScript() {
@@ -76,19 +76,10 @@ async function generateStoryboard() {
 }
 
 async function generateVideo() {
-  const prompt = quill.getText().substring(0, 300); // Truncate to API limit
-
   try {
-    const response = await fetch('https://text-to-video3.p.rapidapi.com/MediaToVideo', {
+    const response = await fetch('/.netlify/functions/video', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Key': RAPIDAPI_KEY, // Replace with your key
-        'X-RapidAPI-Host': 'text-to-video3.p.rapidapi.com'
-      },
-      body: JSON.stringify({
-        prompt: prompt // Match API's expected parameter name
-      })
+      body: JSON.stringify({ prompt: quill.getText() })
     });
 
     if (!response.ok) throw new Error(`API Error: ${response.status}`);
