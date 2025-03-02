@@ -1,7 +1,7 @@
 const quill = new Quill('#editor', { theme: 'snow' });
 
 // RapidAPI Config
-const RAPIDAPI_KEY = '7008b40800mshf5151d0bd0f91a4p1242b7jsnfca887897331'; // Get from RapidAPI Dashboard
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 
 // GPT-4 Script Analysis
 async function analyzeScript() {
@@ -29,9 +29,9 @@ async function analyzeScript() {
 
 // Stable Diffusion Storyboards
 async function generateStoryboard() {
-  const prompt = quill.getText().split('\n')[0]; // Use first line as prompt
+  const text = quill.getText().substring(0, 100); // Use first line as prompt
   
-  const response = await fetch('https://chatgpt-vision1.p.rapidapi.com/texttoimage3', {
+  const response = await fetch('https://open-ai21.p.rapidapi.com/texttoimage2', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -39,8 +39,7 @@ async function generateStoryboard() {
       'X-RapidAPI-Host': 'rapidapi.com'
     },
     body: JSON.stringify({
-      prompt: prompt,
-      num_images: 4
+      text: text
     })
   });
   
