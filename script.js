@@ -76,47 +76,37 @@ async function generateStoryboard() {
 }
 
 async function generateVideo() {
-    const script = quill.getText();
-    
-    // Step 1: Generate audio (using Resemble.AI or other TTS)
-    async function generateVoiceover(text) {
-        const response = await fetch('https://large-text-to-speech.p.rapidapi.com/tts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-RapidAPI-Key': RAPIDAPI_KEY,
-            'X-RapidAPI-Host': 'rapidapi.com'
-          },
-          body: JSON.stringify({
-          project_uuid: 'YOUR_PROJECT_ID',
-          voice: 'sarah', // Pre-built voice
-          text: text.substring(0, 200) // Character limit
-          })
-        });
-    
-        const data = await response.json();
-        return data.audio_url; // URL of generated audio
-    }
-    // Step 2: Create video with avatar
-    const response = await fetch('https://runwayml-api1.p.rapidapi.com/generate/text', {
+  const prompt = quill.getText().substring(0, 300); // Truncate to API limit
+
+  try {
+    const response = await fetch('https://text-to-video3.p.rapidapi.com/MediaToVideo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-RapidAPI-Key': RAPIDAPI_KEY,
-        'X-RapidAPI-Host': 'rapidapi.com'
+        'X-RapidAPI-Key': RAPIDAPI_KEY, // Replace with your key
+        'X-RapidAPI-Host': 'text-to-video3.p.rapidapi.com'
       },
       body: JSON.stringify({
-        "avatar": "anna", // Pre-built avatar
-        "voice": "default",
-        "text": script.substring(0, 300), // Limit to 300 chars for MVP
-        "audioUrl": audioUrl // Optional: Use pre-generated voiceover
+        prompt: prompt // Match API's expected parameter name
       })
     });
-  
-    const data = await response.json();
-    const videoUrl = data.videoUrl;
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
     
-    // Embed video
+    const data = await response.json();
     const container = document.getElementById('video-container');
-    container.innerHTML = `<video controls><source src="${videoUrl}" type="video/mp4"></video>`;
+    
+    // Clear previous content
+    container.innerHTML = '';
+    
+    // Create video element
+    const video = document.createElement('video');
+    video.controls = true;
+    video.src = data.videoUrl; // Verify response structure
+    container.appendChild(video);
+
+  } catch (error) {
+    console.error('Video generation failed:', error);
+    alert('Error: Video generation failed. Check console for details.');
+  }
 }
